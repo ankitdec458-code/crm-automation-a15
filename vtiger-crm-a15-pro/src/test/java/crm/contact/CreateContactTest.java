@@ -1,41 +1,76 @@
 package crm.contact;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Duration;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.safari.SafariDriver;
+
+import generic_utility.FileUtility;
 
 /**
  * Test Case: Create Contact in CRM Application
  * 
- * Author      : Piyush
- * Experience  : Automation Tester | 2 Years
- * Tool Stack  : Java + Selenium WebDriver
+ * Author : Piyush Experience : Automation Tester | 2 Years Tool Stack : Java +
+ * Selenium WebDriver
  * 
- * Objective:
- * Automate the end-to-end flow of creating a new Contact
- * in the CRM application and validate successful creation.
+ * Objective: Automate the end-to-end flow of creating a new Contact in the CRM
+ * application and validate successful creation.
  * 
- * Test Flow:
- * 1. Launch Browser
- * 2. Login to CRM Application
- * 3. Navigate to Contacts Module
- * 4. Create New Contact
- * 5. Validate Contact Creation
- * 6. Close Browser
+ * Test Flow: 1. Launch Browser 2. Login to CRM Application 3. Navigate to
+ * Contacts Module 4. Create New Contact 5. Validate Contact Creation 6. Close
+ * Browser
  */
 
 public class CreateContactTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException {
 
+//		get data from json file
+		FileUtility fUtil = new FileUtility();
+		String BROWSER = fUtil.getDataFromJsonFile("bro");
+		String URL = fUtil.getDataFromJsonFile("url");
+		String USERNAME = fUtil.getDataFromJsonFile("un");
+		String PASSWORD = fUtil.getDataFromJsonFile("pwd");
+		
+		
+//		get data from excel
+		String expectedLastName = fUtil.getDataFromExcelFile("contact", 1, 0);
+		
 		// ==============================
 		// Browser Setup
 		// ==============================
 
-		WebDriver driver = new ChromeDriver();
+		WebDriver driver = null;
+//		String BROWSER = "chrome";
+
+		if (BROWSER.equals("chrome")) {
+			driver = new ChromeDriver();
+		} else if (BROWSER.equals("edge")) {
+			driver = new EdgeDriver();
+		} else if (BROWSER.equals("safari")) {
+			driver = new SafariDriver();
+		} else if (BROWSER.equals("firefox")) {
+			driver = new FirefoxDriver();
+		} else {
+			driver = new ChromeDriver();
+		}
 
 		driver.manage().window().maximize();
 
@@ -45,16 +80,15 @@ public class CreateContactTest {
 		// Launch Application
 		// ==============================
 
-		driver.get("http://localhost:8888");
+		driver.get(URL);
 
 		// ==============================
 		// Login to CRM Application
 		// ==============================
 
-		driver.findElement(By.name("user_name")).sendKeys("admin");
+		driver.findElement(By.name("user_name")).sendKeys(USERNAME);
 
-		driver.findElement(By.name("user_password"))
-		.sendKeys("password" + Keys.ENTER);
+		driver.findElement(By.name("user_password")).sendKeys(PASSWORD + Keys.ENTER);
 
 		System.out.println("Login successful");
 
@@ -71,10 +105,7 @@ public class CreateContactTest {
 		// Create New Contact
 		// ==============================
 
-		// Generate unique Contact Last Name
-		int random = (int)(Math.random()*1000);
-
-		String expectedLastName = "Sharma_" + random;
+//		String expectedLastName = "Sharma" ;
 
 		// Enter Mandatory Field
 		driver.findElement(By.name("lastname")).sendKeys(expectedLastName);
@@ -88,16 +119,14 @@ public class CreateContactTest {
 		// Validation
 		// ==============================
 
-		String actualLastName =
-				driver.findElement(By.id("dtlview_Last Name")).getText();
+		String actualLastName = driver.findElement(By.id("dtlview_Last Name")).getText();
 
-		if(actualLastName.equals(expectedLastName)) {
+		if (actualLastName.equals(expectedLastName)) {
 
 			System.out.println("PASS : Contact Created Successfully");
 
 			System.out.println("Created Contact Last Name : " + actualLastName);
-		}
-		else {
+		} else {
 
 			System.out.println("FAIL : Contact Creation Failed");
 

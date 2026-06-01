@@ -8,6 +8,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 
+import generic_utility.JavaUtility;
+import generic_utility.WebDriverUtility;
+
 /**
  * Test Case: Create Organization in CRM Application
  * 
@@ -69,7 +72,7 @@ public class CreateOrgTest {
 		// ==============================
 
 		// Generate unique organization name
-		int randomNum = (int) (Math.random() * 1000);
+		int randomNum = JavaUtility.generateRandomNumber();
 
 		String expectedOrgName = "AutomationWithPiyush_" + randomNum;
 
@@ -105,9 +108,10 @@ public class CreateOrgTest {
 		WebElement profileIcon = driver.findElement(
 				By.cssSelector("img[src='themes/softed/images/user.PNG']"));
 
-		Actions actions = new Actions(driver);
 
-		actions.moveToElement(profileIcon).perform();
+//		hover on profile
+		WebDriverUtility wdUtil = new WebDriverUtility(driver);
+		wdUtil.hover( profileIcon);
 
 		driver.findElement(By.linkText("Sign Out")).click();
 
