@@ -255,15 +255,7 @@ public class WebDriverUtility {
 
 	// ===== Basic Element Interactions =====
 
-	/**
-	 * Clears text of an input element.
-	 * 
-	 * @param element WebElement input
-	 */
-	public void clearText(WebElement element) {
-		element.clear();
-	}
-
+	
 
 
 	/**
